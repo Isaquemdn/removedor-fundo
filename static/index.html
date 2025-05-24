@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Removedor de Fundo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .preview {
+            margin-top: 20px;
+        }
+        .preview img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Removedor de Fundo</h1>
+        <input type="file" id="imagem" accept="image/*">
+        <br>
+        <button onclick="removerFundo()">Remover Fundo</button>
+
+        <div class="preview">
+            <h3>Imagem Original:</h3>
+            <img id="preview-original" src="" alt="Pré-visualização" style="display:none;">
+            <h3>Imagem Sem Fundo:</h3>
+            <img id="preview-resultado" src="" alt="Resultado" style="display:none;">
+            <br>
+            <a id="download-link" href="#" download="sem-fundo.png" style="display:none;">
+                <button>Baixar Imagem</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function removerFundo() {
+            const input = document.getElementById('imagem');
+            const file = input.files[0];
+
+            if (!file) return alert("Selecione uma imagem primeiro!");
+
+            // Preview da imagem original
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const previewOriginal = document.getElementById('preview-original');
+                previewOriginal.src = e.target.result;
+                previewOriginal.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("http://127.0.0.1:8000/remover-fundo", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                document.getElementById("preview-resultado").src = url;
+                document.getElementById("preview-resultado").style.display = 'block';
+
+                const link = document.getElementById("download-link");
+                link.href = url;
+                link.style.display = 'inline-block';
+            })
+            .catch(error => {
+                console.error("Erro ao remover fundo:", error);
+                alert("Erro ao processar a imagem.");
+            });
+        }
+    </script>
+</body>
+</html>
