@@ -9,7 +9,7 @@ app = FastAPI()
 # ✅ CORS CORRETAMENTE CONFIGURADO
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # durante desenvolvimento, o * é aceitável
+    allow_origins=["http://localhost:8080"],  # durante desenvolvimento, o * é aceitável
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
